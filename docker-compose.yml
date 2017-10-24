@@ -11,6 +11,16 @@ services:
     ports:
       - "3306:3306"
 
+  control_db:
+    image: mariadb:10.3.2
+    container_name: control_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: control_db
+    ports:
+      - "3307:3306"
+
   profiles_service:
     build: ./profiles_service
     container_name: profiles_service
@@ -21,3 +31,14 @@ services:
       - "8000:8000"
     depends_on:
       - profiles_db
+
+  control_service:
+    build: ./control_service
+    container_name: control_service
+    command: python3 control_service/manage.py runserver 0.0.0.0:8001
+    volumes:
+      - .:/code
+    ports:
+      - "8001:8001"
+    depends_on:
+      - control_db
